@@ -1,9 +1,14 @@
 import express from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
+import 'dotenv/config';
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT ?? 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 /* ---------- Middleware ---------- */
 
@@ -53,8 +58,14 @@ app.use((req, res) => {
 /* ---------- Error middleware ---------- */
 
 app.use((err, req, res, next) => {
+  console.error(err);
+
+  const isProd = process.env.NODE_ENV === "production";
+
   res.status(500).json({
-    message: err.message,
+    message: isProd
+      ? "Something went wrong. Please try again later."
+      : err.message,
   });
 });
 

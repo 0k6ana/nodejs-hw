@@ -4,7 +4,7 @@ import pinoHttp from "pino-http";
 import "dotenv/config";
 
 const app = express();
-const PORT = process.env.PORT ?? 3000;
+const PORT = process.env.PORT || 3000;
 
 /* ---------- Middleware ---------- */
 
@@ -28,11 +28,11 @@ app.get("/notes/:noteId", (req, res) => {
   });
 });
 
-app.get("/test-error", () => {
+app.get("/test-error", (req, res) => {
   throw new Error("Simulated server error");
 });
 
-/* ---------- 404 Middleware ---------- */
+/* ---------- 404 ---------- */
 
 app.use((req, res) => {
   res.status(404).json({
@@ -40,17 +40,11 @@ app.use((req, res) => {
   });
 });
 
-/* ---------- Error middleware ---------- */
+/* ---------- Error handler ---------- */
 
 app.use((err, req, res, next) => {
-  console.error(err);
-
-  const isProd = process.env.NODE_ENV === "production";
-
   res.status(500).json({
-    message: isProd
-      ? "Something went wrong. Please try again later."
-      : err.message,
+    message: err.message,
   });
 });
 

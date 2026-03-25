@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { httpLogger } from "./middleware/logger.js";
+import { httpLogger } from './middleware/logger.js';
 
 import { connectMongoDB } from "./db/connectMongoDB.js";
 import notesRoutes from "./routes/notesRoutes.js";
@@ -19,7 +19,7 @@ app.use(express.json());
 
 /* ---------- Routes ---------- */
 
-app.use("/notes", notesRoutes);
+app.use(notesRoutes);
 
 /* ---------- 404 ---------- */
 

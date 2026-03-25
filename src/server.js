@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import {logger} from "./middleware/logger.js"
+import { httpLogger } from "./middleware/logger.js";
 
 import { connectMongoDB } from "./db/connectMongoDB.js";
 import notesRoutes from "./routes/notesRoutes.js";
@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 /* ---------- Middleware ---------- */
 
-app.use(logger);
+app.use(httpLogger);
 app.use(cors());
 app.use(express.json());
 

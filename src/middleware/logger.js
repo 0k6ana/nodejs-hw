@@ -1,7 +1,8 @@
+// src/middleware/logger.js
 import pino from 'pino';
 import pinoHttp from 'pino-http';
 
-const logger = pino({
+export const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
   transport: {
     target: 'pino-pretty',
@@ -13,5 +14,3 @@ const logger = pino({
 });
 
 export const httpLogger = pinoHttp({ logger });
-
-export default logger;

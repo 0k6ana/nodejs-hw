@@ -1,8 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-
-import pinoHttp from "pino-http";
+import {logger} from "./middleware/logger.js"
 
 import { connectMongoDB } from "./db/connectMongoDB.js";
 import notesRoutes from "./routes/notesRoutes.js";
@@ -13,8 +12,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 /* ---------- Middleware ---------- */
-
-const logger = pinoHttp();
 
 app.use(logger);
 app.use(cors());

@@ -12,7 +12,7 @@ app.use(express.json());
 
 app.use(notesRoutes);
 
-//  celebrate errors
+// celebrate errors
 app.use(errors());
 
 // 404
@@ -20,11 +20,15 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });
 });
 
-// 500
+//  500
 app.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     message: err.message || 'Server error',
   });
 });
 
-export default app;
+const PORT = process.env.PORT || 3030;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

@@ -14,9 +14,9 @@ const noteSchema = new mongoose.Schema(
       trim: true,
     },
     tag: {
-      type: String,
-      enum: TAGS,
-      required: true,
+  type: String,
+  enum: TAGS,
+  default: 'Todo',
     },
   },
   { timestamps: true }

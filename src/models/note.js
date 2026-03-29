@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { TAGS } from '../constants/tags.js';
 
 const noteSchema = new mongoose.Schema(
   {
@@ -14,27 +15,13 @@ const noteSchema = new mongoose.Schema(
     },
     tag: {
       type: String,
-      enum: [
-        'Work',
-        'Personal',
-        'Meeting',
-        'Shopping',
-        'Ideas',
-        'Travel',
-        'Finance',
-        'Health',
-        'Important',
-        'Todo',
-      ],
-      default: 'Todo',
+      enum: TAGS,
+      required: true,
     },
   },
-  {
-    timestamps: true,
-    versionKey: false,
-  }
+  { timestamps: true }
 );
 
-const Note = mongoose.model('Note', noteSchema);
+noteSchema.index({ title: 'text', content: 'text' });
 
-export default Note;
+export const Note = mongoose.model('Note', noteSchema);

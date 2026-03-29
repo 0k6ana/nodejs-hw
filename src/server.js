@@ -1,39 +1,30 @@
-import "dotenv/config";
-import express from "express";
-import cors from "cors";
-import { httpLogger } from './middleware/logger.js';
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import { errors } from 'celebrate';
 
-import { connectMongoDB } from "./db/connectMongoDB.js";
-import notesRoutes from "./routes/notesRoutes.js";
-import { notFoundHandler } from "./middleware/notFoundHandler.js";
-import { errorHandler } from "./middleware/errorHandler.js";
+import notesRoutes from './routes/notesRoutes.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-/* ---------- Middleware ---------- */
-
-app.use(httpLogger);
 app.use(cors());
 app.use(express.json());
 
-/* ---------- Routes ---------- */
-
 app.use(notesRoutes);
 
-/* ---------- 404 ---------- */
+//  celebrate errors
+app.use(errors());
 
-app.use(notFoundHandler);
-
-/* ---------- Error handler ---------- */
-
-app.use(errorHandler);
-
-/* ---------- Start server ---------- */
-
-await connectMongoDB();
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// 404
+app.use((req, res) => {
+  res.status(404).json({ message: 'Not found' });
 });
 
+// 500
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    message: err.message || 'Server error',
+  });
+});
+
+export default app;

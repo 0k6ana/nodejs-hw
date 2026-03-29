@@ -5,7 +5,7 @@ import { errors } from 'celebrate';
 
 import notesRoutes from './routes/notesRoutes.js';
 
-import { logger } from './middleware/logger.js';
+import { httpLogger } from './middleware/logger.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -16,7 +16,7 @@ const app = express();
 await connectMongoDB();
 
 // middleware
-app.use(logger);
+app.use(httpLogger);
 app.use(cors());
 app.use(express.json());
 

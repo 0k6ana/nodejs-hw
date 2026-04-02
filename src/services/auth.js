@@ -1,10 +1,10 @@
+// auth.js
 import crypto from "crypto";
 import { Session } from "../models/session.js";
 import { FIFTEEN_MINUTES, ONE_DAY } from "../constants/time.js";
 
 const generateToken = () => crypto.randomBytes(32).toString("hex");
 
-// Створення нової сесії
 export const createSession = async (userId) => {
   const accessToken = generateToken();
   const refreshToken = generateToken();
@@ -23,13 +23,12 @@ export const createSession = async (userId) => {
   return session;
 };
 
-// auth.js
 export const setSessionCookies = (res, session) => {
   const isProduction = process.env.NODE_ENV === "production";
 
   res.cookie("accessToken", session.accessToken, {
     httpOnly: true,
-    secure: isProduction,            // true тільки у продакшн
+    secure: isProduction,
     sameSite: isProduction ? "none" : "lax",
     maxAge: FIFTEEN_MINUTES,
   });
@@ -47,4 +46,13 @@ export const setSessionCookies = (res, session) => {
     sameSite: isProduction ? "none" : "lax",
     maxAge: ONE_DAY,
   });
+};
+
+// <-- Додаємо цю функцію!
+export const clearSessionCookies = (res) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.clearCookie("accessToken", { httpOnly: true, secure: isProduction, sameSite: isProduction ? "none" : "lax" });
+  res.clearCookie("refreshToken", { httpOnly: true, secure: isProduction, sameSite: isProduction ? "none" : "lax" });
+  res.clearCookie("sessionId", { httpOnly: true, secure: isProduction, sameSite: isProduction ? "none" : "lax" });
 };

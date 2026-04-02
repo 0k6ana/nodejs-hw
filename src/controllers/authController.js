@@ -41,7 +41,7 @@ export const loginUser = async (req, res, next) => {
     const session = await createSession(user._id);
     setSessionCookies(res, session);
 
-    res.status(200).json({ message: "Logged in successfully", user });
+    res.status(200).json(user);
   } catch (error) {
     next(error);
   }

@@ -4,6 +4,7 @@ import cors from "cors";
 import { errors } from "celebrate";
 
 import notesRoutes from "./routes/notesRoutes.js";
+import authRoutes from "./routes/authRoutes.js"
 
 import { httpLogger } from "./middleware/logger.js";
 import { notFoundHandler } from "./middleware/notFoundHandler.js";
@@ -21,6 +22,9 @@ app.use(httpLogger);
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(authRoutes);
+app.use(notesRoutes);
 
 // routes
 app.use(notesRoutes);

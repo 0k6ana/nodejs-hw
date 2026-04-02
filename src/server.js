@@ -26,8 +26,6 @@ app.use(cookieParser());
 app.use(authRoutes);
 app.use(notesRoutes);
 
-// routes
-app.use(notesRoutes);
 
 // celebrate errors
 app.use(errors());

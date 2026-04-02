@@ -48,13 +48,16 @@ export const loginUser = async (req, res, next) => {
 };
 
 // LOGOUT
+
 export const logoutUser = async (req, res, next) => {
   try {
     const { sessionId } = req.cookies;
     if (sessionId) await Session.findByIdAndDelete(sessionId);
 
     clearSessionCookies(res);
-    res.status(200).json({ message: "Logged out successfully" });
+
+
+    res.status(204).send();
   } catch (error) {
     next(error);
   }

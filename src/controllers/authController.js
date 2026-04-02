@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
 import { User } from "../models/user.js";
 import { Session } from "../models/session.js";
-import { createSession, setSessionCookies, clearSessionCookies } from "../services/auth.js";
+import { createSession, setSessionCookies } from "../services/auth.js"; // тільки гарантовані експорти
 
 // REGISTER
 export const registerUser = async (req, res, next) => {
@@ -41,7 +41,6 @@ export const loginUser = async (req, res, next) => {
     const session = await createSession(user._id);
     setSessionCookies(res, session);
 
-
     res.status(200).json(user);
   } catch (error) {
     next(error);
@@ -52,9 +51,13 @@ export const loginUser = async (req, res, next) => {
 export const logoutUser = async (req, res, next) => {
   try {
     const { sessionId } = req.cookies;
+
     if (sessionId) await Session.findByIdAndDelete(sessionId);
 
-    clearSessionCookies(res);
+
+    res.clearCookie("accessToken", { httpOnly: true, secure: true, sameSite: "none" });
+    res.clearCookie("refreshToken", { httpOnly: true, secure: true, sameSite: "none" });
+    res.clearCookie("sessionId", { httpOnly: true, secure: true, sameSite: "none" });
 
     res.status(204).send();
   } catch (error) {
@@ -83,8 +86,7 @@ export const refreshUserSession = async (req, res, next) => {
     setSessionCookies(res, newSession);
 
 
-    const user = await User.findById(session.userId);
-    res.status(200).json(user);
+    res.status(200).json({ message: "Session refreshed successfully" });
   } catch (error) {
     next(error);
   }

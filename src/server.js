@@ -10,6 +10,7 @@ import { notFoundHandler } from "./middleware/notFoundHandler.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 import { connectMongoDB } from "./db/connectMongoDB.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -19,6 +20,7 @@ await connectMongoDB();
 app.use(httpLogger);
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // routes
 app.use(notesRoutes);

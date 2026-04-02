@@ -4,6 +4,7 @@ import { FIFTEEN_MINUTES, ONE_DAY } from "../constants/time.js";
 
 const generateToken = () => crypto.randomBytes(32).toString("hex");
 
+// Створення нової сесії
 export const createSession = async (userId) => {
   const accessToken = generateToken();
   const refreshToken = generateToken();
@@ -22,6 +23,7 @@ export const createSession = async (userId) => {
   return session;
 };
 
+// Встановлюємо куки сесії
 export const setSessionCookies = (res, session) => {
   res.cookie("accessToken", session.accessToken, {
     httpOnly: true,
@@ -43,4 +45,11 @@ export const setSessionCookies = (res, session) => {
     sameSite: "none",
     maxAge: ONE_DAY,
   });
+};
+
+// Очищуємо куки сесії
+export const clearSessionCookies = (res) => {
+  res.clearCookie("accessToken", { httpOnly: true, secure: true, sameSite: "none" });
+  res.clearCookie("refreshToken", { httpOnly: true, secure: true, sameSite: "none" });
+  res.clearCookie("sessionId", { httpOnly: true, secure: true, sameSite: "none" });
 };

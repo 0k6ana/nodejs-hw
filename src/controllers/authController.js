@@ -41,6 +41,7 @@ export const loginUser = async (req, res, next) => {
     const session = await createSession(user._id);
     setSessionCookies(res, session);
 
+
     res.status(200).json(user);
   } catch (error) {
     next(error);
@@ -48,14 +49,12 @@ export const loginUser = async (req, res, next) => {
 };
 
 // LOGOUT
-
 export const logoutUser = async (req, res, next) => {
   try {
     const { sessionId } = req.cookies;
     if (sessionId) await Session.findByIdAndDelete(sessionId);
 
     clearSessionCookies(res);
-
 
     res.status(204).send();
   } catch (error) {
@@ -70,7 +69,8 @@ export const refreshUserSession = async (req, res, next) => {
     if (!sessionId || !refreshToken) throw createHttpError(401, "No session or refresh token");
 
     const session = await Session.findById(sessionId);
-    if (!session || session.refreshToken !== refreshToken) throw createHttpError(401, "Invalid session or refresh token");
+    if (!session || session.refreshToken !== refreshToken)
+      throw createHttpError(401, "Invalid session or refresh token");
 
     const now = new Date();
     if (session.refreshTokenExpiresAt < now) {
@@ -82,7 +82,9 @@ export const refreshUserSession = async (req, res, next) => {
     const newSession = await createSession(session.userId);
     setSessionCookies(res, newSession);
 
-    res.status(200).json({ message: "Session refreshed successfully" });
+
+    const user = await User.findById(session.userId);
+    res.status(200).json(user);
   } catch (error) {
     next(error);
   }

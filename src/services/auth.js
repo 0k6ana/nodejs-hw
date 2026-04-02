@@ -1,4 +1,3 @@
-// auth.js
 import crypto from "crypto";
 import { Session } from "../models/session.js";
 import { FIFTEEN_MINUTES, ONE_DAY } from "../constants/time.js";
@@ -48,7 +47,6 @@ export const setSessionCookies = (res, session) => {
   });
 };
 
-// <-- Додаємо цю функцію!
 export const clearSessionCookies = (res) => {
   const isProduction = process.env.NODE_ENV === "production";
 

@@ -4,6 +4,7 @@ import { User } from "../models/user.js";
 import { Session } from "../models/session.js";
 import { createSession, setSessionCookies } from "../services/auth.js";
 import jwt from "jsonwebtoken";
+import { sendEmail } from "../utils/sendMail.js";
 
 // REGISTER
 export const registerUser = async (req, res, next) => {
@@ -93,11 +94,6 @@ export const refreshUserSession = async (req, res, next) => {
   }
 };
 
-
-
-
-import jwt from "jsonwebtoken";
-import { sendEmail } from "../utils/sendMail.js";
 
 // REQUEST RESET EMAIL
 export const requestResetEmail = async (req, res) => {

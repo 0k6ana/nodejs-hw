@@ -1,7 +1,3 @@
-import jwt from "jsonwebtoken";
-import createHttpError from "http-errors";
-import { User } from "../models/user.js";
-
 export const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -17,7 +13,6 @@ export const authenticate = async (req, res, next) => {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-
     const user = await User.findById(payload.sub);
 
     if (!user) {
@@ -25,7 +20,6 @@ export const authenticate = async (req, res, next) => {
     }
 
     req.user = user;
-
     next();
   } catch {
     return next(createHttpError(401, "Unauthorized"));

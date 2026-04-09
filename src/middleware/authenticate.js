@@ -1,48 +1,33 @@
+import jwt from "jsonwebtoken";
 import createHttpError from "http-errors";
-import { Session } from "../models/session.js";
 import { User } from "../models/user.js";
 
-export const authenticate = async (req, res, next) => {
+export default async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return next(createHttpError(401, "Unauthorized"));
+  }
+
+  const [bearer, token] = authHeader.split(" ");
+
+  if (bearer !== "Bearer" || !token) {
+    return next(createHttpError(401, "Unauthorized"));
+  }
+
   try {
-    let accessToken;
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (req.headers.authorization) {
-      const [type, token] = req.headers.authorization.split(" ");
-
-      if (type === "Bearer") {
-        accessToken = token;
-      }
-    }
-
-
-    if (!accessToken && req.cookies?.accessToken) {
-      accessToken = req.cookies.accessToken;
-    }
-
-    if (!accessToken) {
-      throw createHttpError(401, "Not authorized");
-    }
-
-    const session = await Session.findOne({ accessToken });
-
-    if (!session) {
-      throw createHttpError(401, "Session not found");
-    }
-
-    if (new Date() > new Date(session.accessTokenValidUntil)) {
-      throw createHttpError(401, "Access token expired");
-    }
-
-    const user = await User.findById(session.userId);
+    const user = await User.findById(payload.sub);
 
     if (!user) {
-      throw createHttpError(401, "User not found");
+      return next(createHttpError(401, "Unauthorized"));
     }
 
     req.user = user;
 
     next();
-  } catch (error) {
-    next(error);
+  } catch {
+    return next(createHttpError(401, "Unauthorized"));
   }
 };

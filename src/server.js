@@ -13,6 +13,7 @@ import userRoutes from "./routes/userRoutes.js";
 import { httpLogger } from "./middleware/logger.js";
 import { notFoundHandler } from "./middleware/notFoundHandler.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { catchAsync } from "../utils/catchAsync.js";
 
 const app = express();
 

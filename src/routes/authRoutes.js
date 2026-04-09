@@ -1,26 +1,12 @@
 import express from "express";
-import {
-  requestResetEmail,
-  resetPassword,
-} from "../controllers/authController.js";
-import validateBody from "../middleware/validateBody.js";
-import {
-  requestResetEmailSchema,
-  resetPasswordSchema,
-} from "../validations/authValidation.js";
+import { celebrate } from "celebrate";
+import { requestResetEmail, resetPassword } from "../controllers/authController.js";
+import { requestResetEmailSchema, resetPasswordSchema } from "../validations/authValidation.js";
+import { catchAsync } from "../utils/catchAsync.js";
 
 const router = express.Router();
 
-router.post(
-  "/request-reset-email",
-  validateBody(requestResetEmailSchema),
-  requestResetEmail
-);
-
-router.post(
-  "/reset-password",
-  validateBody(resetPasswordSchema),
-  resetPassword
-);
+router.post("/auth/request-reset-email", celebrate(requestResetEmailSchema), catchAsync(requestResetEmail));
+router.post("/auth/reset-password", celebrate(resetPasswordSchema), catchAsync(resetPassword));
 
 export default router;

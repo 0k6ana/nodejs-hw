@@ -1,19 +1,12 @@
 import createHttpError from "http-errors";
 import { saveFileToCloudinary } from "../utils/saveFileToCloudinary.js";
-import { User } from "../models/user.js";
 
 export const updateUserAvatar = async (req, res) => {
-  if (!req.file) {
-    throw createHttpError(400, "No file");
-  }
+  if (!req.file) throw createHttpError(400, "No file");
 
   const result = await saveFileToCloudinary(req.file.buffer);
+  req.user.avatar = result.secure_url;
+  await req.user.save();
 
-  const user = await User.findByIdAndUpdate(
-    req.user._id,
-    { avatar: result.secure_url },
-    { new: true }
-  );
-
-  res.json({ url: user.avatar });
+  res.status(200).json({ url: result.secure_url });
 };

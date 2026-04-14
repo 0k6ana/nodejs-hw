@@ -6,7 +6,7 @@ import { catchAsync } from "../utils/catchAsync.js";
 
 const router = express.Router();
 
-router.post("/auth/request-reset-email", celebrate(requestResetEmailSchema), catchAsync(requestResetEmail));
-router.post("/auth/reset-password", celebrate(resetPasswordSchema), catchAsync(resetPassword));
+router.post("/request-reset-email", celebrate(requestResetEmailSchema), catchAsync(requestResetEmail));
+router.post("/reset-password", celebrate(resetPasswordSchema), catchAsync(resetPassword));
 
 export default router;

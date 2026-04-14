@@ -12,13 +12,12 @@ export const requestResetEmail = async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
 
-  // Незнайдений користувач — повертаємо 200 для безпеки
   if (!user) return res.status(200).json({ message: "Password reset email sent successfully" });
 
-  // Генеруємо JWT на 15 хв
+
   const token = jwt.sign({ sub: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "15m" });
 
-  // HTML шаблон
+
   const templatePath = path.join(process.cwd(), "src/templates/reset-password-email.html");
   const templateSource = fs.readFileSync(templatePath, "utf-8");
   const template = handlebars.compile(templateSource);

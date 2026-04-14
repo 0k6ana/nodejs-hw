@@ -14,42 +14,47 @@ import { httpLogger } from "./middleware/logger.js";
 import { notFoundHandler } from "./middleware/notFoundHandler.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
-
 const app = express();
 
-// Підключення до БД
+// ========================
+// DB CONNECTION
+// ========================
 await connectMongoDB();
 
-// Middleware
+// ========================
+// BASE MIDDLEWARE
+// ========================
 app.use(httpLogger);
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-// Роути
+// ========================
+// ROUTES
+// ========================
 app.use("/auth", authRoutes);
 app.use(notesRoutes);
 app.use("/users", userRoutes);
 
+// ========================
+// CELEBRATE ERRORS (ВАЖЛИВО: ПЕРЕД 404)
+// ========================
 app.use(errors());
 
-// 404
+// ========================
+// 404 HANDLER
+// ========================
 app.use(notFoundHandler);
 
-//  глобальна помилка
+// ========================
+// GLOBAL ERROR HANDLER (ОДИН ЄДИНИЙ)
+// ========================
 app.use(errorHandler);
 
-//  запуск сервера
+// ========================
+// SERVER START
+// ========================
 const PORT = process.env.PORT || 3000;
-
-// Глобальний обробник помилок
-app.use((err, req, res, next) => {
-  console.error("💥 Global Error:", err);
-  res.status(err.status || 500).json({
-    message: err.message || "Internal Server Error",
-    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
-  });
-});
 
 app.listen(PORT, () => {
   console.log(`✅ Server is running on port ${PORT}`);

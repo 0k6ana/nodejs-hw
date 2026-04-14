@@ -1,12 +1,64 @@
 import express from "express";
 import { celebrate } from "celebrate";
-import { requestResetEmail, resetPassword } from "../controllers/authController.js";
-import { requestResetEmailSchema, resetPasswordSchema } from "../validations/authValidation.js";
-import { catchAsync } from "../utils/catchAsync.js";
+
+import {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshUserSession,
+  requestResetEmail,
+  resetPassword,
+} from "../controllers/authController.js";
+
+import {
+  registerUserSchema,
+  loginUserSchema,
+  requestResetEmailSchema,
+  resetPasswordSchema,
+} from "../validations/authValidation.js";
 
 const router = express.Router();
 
-router.post("/request-reset-email", celebrate(requestResetEmailSchema), catchAsync(requestResetEmail));
-router.post("/reset-password", celebrate(resetPasswordSchema), catchAsync(resetPassword));
+
+// ========================
+// AUTH ROUTES
+// ========================
+router.post(
+  "/register",
+  celebrate(registerUserSchema),
+  registerUser
+);
+
+router.post(
+  "/login",
+  celebrate(loginUserSchema),
+  loginUser
+);
+
+router.post(
+  "/logout",
+  logoutUser
+);
+
+router.post(
+  "/refresh",
+  refreshUserSession
+);
+
+
+// ========================
+// PASSWORD RESET
+// ========================
+router.post(
+  "/request-reset-email",
+  celebrate(requestResetEmailSchema),
+  requestResetEmail
+);
+
+router.post(
+  "/reset-password",
+  celebrate(resetPasswordSchema),
+  resetPassword
+);
 
 export default router;

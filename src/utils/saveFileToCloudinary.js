@@ -10,10 +10,20 @@ cloudinary.config({
 
 export const saveFileToCloudinary = (buffer) => {
   return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream({ folder: "avatars" }, (error, result) => {
-      if (error) reject(error);
-      else resolve(result);
-    });
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "avatars",
+        resource_type: "image",
+        overwrite: true,
+        use_filename: true,
+        unique_filename: false,
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+
     Readable.from(buffer).pipe(stream);
   });
 };

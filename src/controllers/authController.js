@@ -23,7 +23,7 @@ export const registerUser = async (req, res) => {
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw createHttpError(409, "Email already in use");
+    throw createHttpError(400, "Email already in use");
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -34,11 +34,11 @@ export const registerUser = async (req, res) => {
     password: hashedPassword,
   });
 
-  res.status(201).json({
-    id: user._id,
-    email: user.email,
-    username: user.username,
-  });
+  // create session immediately
+  const session = await createSession(user._id);
+  setSessionCookies(res, session);
+
+  res.status(201).json(user);
 };
 
 
@@ -58,13 +58,13 @@ export const loginUser = async (req, res) => {
     throw createHttpError(401, "Invalid credentials");
   }
 
-  const session = await createSession(user._id);
+  // remove old sessions
+  await Session.deleteMany({ userId: user._id });
 
+  const session = await createSession(user._id);
   setSessionCookies(res, session);
 
-  res.json({
-    accessToken: session.accessToken,
-  });
+  res.json(user);
 };
 
 
@@ -80,6 +80,7 @@ export const logoutUser = async (req, res) => {
 
   res.clearCookie("sessionId");
   res.clearCookie("refreshToken");
+  res.clearCookie("accessToken");
 
   res.status(204).send();
 };
@@ -96,18 +97,24 @@ export const refreshUserSession = async (req, res) => {
     throw createHttpError(401, "Session not found");
   }
 
+  // verify token expiry
+  try {
+    jwt.verify(refreshToken, process.env.JWT_SECRET);
+  } catch {
+    throw createHttpError(401, "Refresh token expired or invalid");
+  }
+
   if (session.refreshToken !== refreshToken) {
     throw createHttpError(401, "Invalid refresh token");
   }
 
-  const newSession = await createSession(session.userId);
-
   await Session.deleteOne({ _id: sessionId });
 
+  const newSession = await createSession(session.userId);
   setSessionCookies(res, newSession);
 
   res.json({
-    accessToken: newSession.accessToken,
+    message: "Session refreshed successfully",
   });
 };
 
@@ -120,7 +127,6 @@ export const requestResetEmail = async (req, res) => {
 
   const user = await User.findOne({ email });
 
-  // завжди однакова відповідь (без витоку інформації)
   if (!user) {
     return res.status(200).json({
       message: "Password reset email sent successfully",
@@ -147,21 +153,17 @@ export const requestResetEmail = async (req, res) => {
   });
 
   try {
-    await sendEmail(
-      user.email,
-      "Password Reset",
+    await sendEmail({
+      to: user.email,
+      subject: "Password Reset",
       html,
-      process.env.SMTP_FROM // ✅ ВИПРАВЛЕНО
-    );
+    });
 
     res.status(200).json({
       message: "Password reset email sent successfully",
     });
   } catch {
-    throw createHttpError(
-      500,
-      "Failed to send the email, please try again later."
-    );
+    throw createHttpError(500, "Failed to send email");
   }
 };
 

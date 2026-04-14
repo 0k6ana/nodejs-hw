@@ -30,16 +30,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 // ========================
-// ROUTES
+// ROUTES (NO PREFIXES)
 // ========================
-app.use("/auth", authRoutes);
+app.use(authRoutes);
 app.use(notesRoutes);
-app.use("/users", userRoutes);
-
-// ========================
-// CELEBRATE ERRORS (ВАЖЛИВО: ПЕРЕД 404)
-// ========================
-app.use(errors());
+app.use(userRoutes);
 
 // ========================
 // 404 HANDLER
@@ -47,7 +42,12 @@ app.use(errors());
 app.use(notFoundHandler);
 
 // ========================
-// GLOBAL ERROR HANDLER (ОДИН ЄДИНИЙ)
+// CELEBRATE ERRORS (AFTER 404)
+// ========================
+app.use(errors());
+
+// ========================
+// GLOBAL ERROR HANDLER
 // ========================
 app.use(errorHandler);
 

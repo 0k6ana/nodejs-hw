@@ -34,7 +34,6 @@ export const registerUser = async (req, res) => {
     password: hashedPassword,
   });
 
-  // create session immediately
   const session = await createSession(user._id);
   setSessionCookies(res, session);
 
@@ -49,16 +48,11 @@ export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
-  if (!user) {
-    throw createHttpError(401, "Invalid credentials");
-  }
+  if (!user) throw createHttpError(401, "Invalid credentials");
 
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    throw createHttpError(401, "Invalid credentials");
-  }
+  if (!isMatch) throw createHttpError(401, "Invalid credentials");
 
-  // remove old sessions
   await Session.deleteMany({ userId: user._id });
 
   const session = await createSession(user._id);
@@ -97,21 +91,12 @@ export const refreshUserSession = async (req, res) => {
     throw createHttpError(401, "Session not found");
   }
 
-  // verify token expiry
- try {
-  await sendEmail({
-    from: process.env.SMTP_FROM,
-    to: user.email,
-    subject: "Password Reset",
-    html,
-  });
-
-  res.status(200).json({
-    message: "Password reset email sent successfully",
-  });
-} catch {
-  throw createHttpError(500, "Failed to send email");
-}
+  // FIX: verify JWT expiry properly
+  try {
+    jwt.verify(refreshToken, process.env.JWT_SECRET);
+  } catch {
+    throw createHttpError(401, "Refresh token expired or invalid");
+  }
 
   if (session.refreshToken !== refreshToken) {
     throw createHttpError(401, "Invalid refresh token");
@@ -163,6 +148,7 @@ export const requestResetEmail = async (req, res) => {
 
   try {
     await sendEmail({
+      from: process.env.SMTP_FROM,
       to: user.email,
       subject: "Password Reset",
       html,

@@ -98,11 +98,20 @@ export const refreshUserSession = async (req, res) => {
   }
 
   // verify token expiry
-  try {
-    jwt.verify(refreshToken, process.env.JWT_SECRET);
-  } catch {
-    throw createHttpError(401, "Refresh token expired or invalid");
-  }
+ try {
+  await sendEmail({
+    from: process.env.SMTP_FROM,
+    to: user.email,
+    subject: "Password Reset",
+    html,
+  });
+
+  res.status(200).json({
+    message: "Password reset email sent successfully",
+  });
+} catch {
+  throw createHttpError(500, "Failed to send email");
+}
 
   if (session.refreshToken !== refreshToken) {
     throw createHttpError(401, "Invalid refresh token");
